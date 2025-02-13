@@ -1,3 +1,25 @@
+MOQ_Rounding_Total_Yes_Count =
+SUMX(
+    'Snapshot',
+    VAR ShippedQty = 'Snapshot'[Shipped Qty]
+    VAR MOQ = 'Snapshot'[MOQ]
+    VAR Rounding = 'Snapshot'[Rounding Vale]
+    VAR MOQ_Check = IF(MOQ < 0.95 * ShippedQty, 1, 0)
+    VAR Rounding_Check = IF(Rounding < 0.9 * ShippedQty, 1, 0)
+    RETURN 
+    IF(MOQ_Check = 1 || Rounding_Check = 1, 1, 0)
+)
+
+
+MOQ_Rounding_Yes_Percentage =
+DIVIDE(
+    [MOQ_Rounding_Total_Yes_Count], 
+    COUNTROWS('Snapshot'),
+    0
+)
+
+
+
 MOQ_Rounding_Summary =
 VAR YesCount = SUMX(
     'Snapshot',
