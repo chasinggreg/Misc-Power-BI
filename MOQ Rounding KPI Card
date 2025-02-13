@@ -1,26 +1,26 @@
-MOQ_Rounding_Total_Yes_Count =
-SUMX(
+1️⃣ Count of "Yes" Orders (with Icon)
+
+MOQ_Rounding_Yes_Count =
+VAR YesCount = SUMX(
     'Snapshot',
     VAR ShippedQty = 'Snapshot'[Shipped Qty]
     VAR MOQ = 'Snapshot'[MOQ]
     VAR Rounding = 'Snapshot'[Rounding Vale]
     VAR MOQ_Check = IF(MOQ < 0.95 * ShippedQty, 1, 0)
     VAR Rounding_Check = IF(Rounding < 0.9 * ShippedQty, 1, 0)
-    RETURN 
-    IF(MOQ_Check = 1 || Rounding_Check = 1, 1, 0)
+    RETURN IF(MOQ_Check = 1 || Rounding_Check = 1, 1, 0)
 )
+VAR Icon = IF(YesCount > 0, "⚠️", "✅") -- Warning icon if issues exist, checkmark if none
 
+RETURN
+    Icon & " " & FORMAT(YesCount, "#,##0")
+
+👉 Example Output: ⚠️ 32
+
+
+2️⃣ Percentage of "Yes" Orders (with Icon)
 
 MOQ_Rounding_Yes_Percentage =
-DIVIDE(
-    [MOQ_Rounding_Total_Yes_Count], 
-    COUNTROWS('Snapshot'),
-    0
-)
-
-
-
-MOQ_Rounding_Summary =
 VAR YesCount = SUMX(
     'Snapshot',
     VAR ShippedQty = 'Snapshot'[Shipped Qty]
@@ -31,16 +31,23 @@ VAR YesCount = SUMX(
     RETURN IF(MOQ_Check = 1 || Rounding_Check = 1, 1, 0)
 )
 VAR TotalCount = COUNTROWS('Snapshot')
-VAR Percentage = FORMAT(DIVIDE(YesCount, TotalCount, 0), "0.0%")
-
--- Choose an icon based on the percentage threshold
+VAR Percentage = DIVIDE(YesCount, TotalCount, 0)
 VAR Icon =
     SWITCH(
         TRUE(),
-        Percentage > 0.5, "🔴", -- Red Circle if >50% of orders fail MOQ/Rounding
-        Percentage > 0.2, "🟠", -- Orange Circle if 20%-50%
-        "🟢" -- Green Circle if <20%
+        Percentage > 0.5, "🔴",  -- Red if more than 50% fail
+        Percentage > 0.2, "🟠",  -- Orange if 20%-50%
+        "🟢"                      -- Green if less than 20%
     )
 
 RETURN
-    Icon & " " & FORMAT(YesCount, "#,##0") & " Issues (" & Percentage & ")"
+    Icon & " " & FORMAT(Percentage, "0.0%")
+
+👉 Example Output: 🟠 28.5%
+
+Create two Card visuals:
+
+    Use MOQ_Rounding_Yes_Count for the count KPI.
+    Use MOQ_Rounding_Yes_Percentage for the percentage KPI.
+
+Set both to display as text, not numbers.
