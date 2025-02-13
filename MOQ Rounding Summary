@@ -1,0 +1,24 @@
+MOQ_Rounding_Summary =
+VAR YesCount = SUMX(
+    'Snapshot',
+    VAR ShippedQty = 'Snapshot'[Shipped Qty]
+    VAR MOQ = 'Snapshot'[MOQ]
+    VAR Rounding = 'Snapshot'[Rounding Vale]
+    VAR MOQ_Check = IF(MOQ < 0.95 * ShippedQty, 1, 0)
+    VAR Rounding_Check = IF(Rounding < 0.9 * ShippedQty, 1, 0)
+    RETURN IF(MOQ_Check = 1 || Rounding_Check = 1, 1, 0)
+)
+VAR TotalCount = COUNTROWS('Snapshot')
+VAR Percentage = FORMAT(DIVIDE(YesCount, TotalCount, 0), "0.0%")
+
+-- Choose an icon based on the percentage threshold
+VAR Icon =
+    SWITCH(
+        TRUE(),
+        Percentage > 0.5, "🔴", -- Red Circle if >50% of orders fail MOQ/Rounding
+        Percentage > 0.2, "🟠", -- Orange Circle if 20%-50%
+        "🟢" -- Green Circle if <20%
+    )
+
+RETURN
+    Icon & " " & FORMAT(YesCount, "#,##0") & " Issues (" & Percentage & ")"
