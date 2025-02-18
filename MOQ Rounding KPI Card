@@ -23,15 +23,15 @@ RETURN
 MOQ_Rounding_Yes_Percentage =
 VAR YesCount = SUMX(
     'Snapshot',
-    VAR ShippedQty = 'Snapshot'[Shipped Qty]
     VAR MOQ = 'Snapshot'[MOQ]
     VAR Rounding = 'Snapshot'[Rounding Vale]
+    VAR ShippedQty = 'Snapshot'[Shipped Qty]
     VAR MOQ_Check = IF(MOQ < 0.95 * ShippedQty, 1, 0)
     VAR Rounding_Check = IF(Rounding < 0.9 * ShippedQty, 1, 0)
     RETURN IF(MOQ_Check = 1 || Rounding_Check = 1, 1, 0)
 )
-VAR TotalCount = COUNTROWS('Snapshot')
-VAR Percentage = DIVIDE(YesCount, TotalCount, 0)
+VAR TotalOrders = COUNTROWS('Snapshot')  -- Count of all orders
+VAR Percentage = DIVIDE(YesCount, TotalOrders, 0) -- Avoid division by zero
 VAR Icon =
     SWITCH(
         TRUE(),
