@@ -1,1 +1,29 @@
+1️⃣ Subtitle (Total Count of "Yes" Orders)
 
+IsOrderOlderThan18M_Count =
+VAR YesCount = COUNTROWS(FILTER('Snapshot', 'Snapshot'[Is Order Older Than 18 Months] = "Yes"))
+VAR Icon = IF(YesCount > 0, "⚠️", "✅") -- Warning icon if issues exist, check mark if none
+RETURN
+    Icon & " " & FORMAT(YesCount, "#,##0")
+
+
+👉 Example Output: 🟠 275
+
+
+2️⃣ Callout Value (Percentage of "Yes" Orders)
+
+IsOrderOlderThan18M_Percentage =
+VAR YesCount = COUNTROWS(FILTER('Snapshot', 'Snapshot'[Is Order Older Than 18 Months] = "Yes"))
+VAR TotalOrders = DISTINCTCOUNT('Snapshot'[Doc Nbr])  -- Count of unique orders
+VAR Percentage = DIVIDE(YesCount, TotalOrders, 0) -- Avoid division by zero
+VAR Icon =
+    SWITCH(
+        TRUE(),
+        Percentage > 0.5, "🔴",  -- Red if more than 50% of orders
+        Percentage > 0.2, "🟠",  -- Orange if 20%-50%
+        "🟢"                      -- Green if less than 20%
+    )
+RETURN
+    Icon & " " & FORMAT(Percentage, "0.0%")
+
+👉 Example Output: 🟢 12.5%
