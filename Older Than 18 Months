@@ -16,13 +16,16 @@ RETURN
 2️⃣ Callout Value (Percentage of "Yes" Orders)
 
 IsOrderOlderThan18M_Percent =
-VAR YesCount = COUNTROWS(
-    FILTER('Snapshot', 'Snapshot'[Is Order Older Than 18 Months] = "Yes")
-)
-VAR TotalOrders = DISTINCTCOUNT('Snapshot'[Doc Nbr])
+VAR CutoffDate = TODAY() - 18 * 30
+VAR YesCount = 
+    CALCULATE(
+        COUNT('Snapshot'[Doc Nbr]),
+        'Snapshot'[Order Creation Date] < CutoffDate
+    )
+VAR TotalOrders = COUNT('Snapshot'[Doc Nbr])
 RETURN
 IF(
-    TotalOrders = 0, BLANK(), -- Avoid divide by zero errors
+    TotalOrders = 0, BLANK(),
     FORMAT(YesCount / TotalOrders, "0.0%")
 )
 
