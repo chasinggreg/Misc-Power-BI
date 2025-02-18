@@ -1,33 +1,27 @@
-1️⃣ Subtitle (Total Count of "Yes" Orders)
+Is Order Older Than 18 Months = 
+VAR CutoffDate = TODAY() - 18 * 30
+RETURN
+IF(
+    'Snapshot'[SAP PO/STO - Order Creation Date] < CutoffDate,
+    "Yes",
+    "No"
+)
 
-IsOrderOlderThan18M_Count =
+
+IsOrderOlderThan18M_Count = 
 VAR YesCount = COUNTROWS(
     FILTER('Snapshot', 'Snapshot'[Is Order Older Than 18 Months] = "Yes")
 )
-VAR Icon = IF(YesCount > 0, "⚠️", "✅") -- Warning if issues exist, checkmark if none
+VAR Icon = IF(YesCount > 0, "⚠️", "✅")  -- Warning if there are old orders
 RETURN
     Icon & " " & FORMAT(YesCount, "#,##0")
 
 
-
-👉 Example Output: 🟠 275
-
-
-2️⃣ Callout Value (Percentage of "Yes" Orders)
-
-IsOrderOlderThan18M_Percent =
-VAR CutoffDate = TODAY() - 18 * 30
-VAR YesCount = 
-    CALCULATE(
-        COUNT('Snapshot'[Doc Nbr]),
-        'Snapshot'[Order Creation Date] < CutoffDate
-    )
-VAR TotalOrders = COUNT('Snapshot'[Doc Nbr])
-RETURN
-IF(
-    TotalOrders = 0, BLANK(),
-    FORMAT(YesCount / TotalOrders, "0.0%")
+IsOrderOlderThan18M_Percentage = 
+VAR YesCount = COUNTROWS(
+    FILTER('Snapshot', 'Snapshot'[Is Order Older Than 18 Months] = "Yes")
 )
-
-
-👉 Example Output: 🟢 12.5%
+VAR TotalOrders = COUNTROWS('Snapshot')
+VAR Percentage = DIVIDE(YesCount, TotalOrders, 0)
+RETURN
+    FORMAT(Percentage, "0.0%")
