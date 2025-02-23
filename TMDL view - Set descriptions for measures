@@ -1,0 +1,8 @@
+Help me add or replace descriptions for each measure.
+Consider the following rules:
+- insert or replace the description that should appear above the measure code and after ///
+- use business friendly terms
+- describe the DAX code in the description in business-friendly terms. Do not copy the code to the description.
+- use the name and other measures as context
+- description should not be longer than 500 chars
+// Orginally find here: https://fabsnippets.replit.app/snippet/24
